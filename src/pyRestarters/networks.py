@@ -15,69 +15,73 @@ GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-This module provides access to the groups and groups part of the API
+This module provides access to the Networks and Network part of the API
 """
-
+from typing import Any
 import datetime
 import urllib.parse
 
 from ._base_client import APIBase
 from .events import Event
+from .groups import Group
 
 #pylint:disable-next=too-few-public-methods
-class Groups(APIBase):
+class Networks(APIBase):
     """
-    All the groups on the Restarters.net website
+    All the networks on the Restarters.net website
     """
 
 
     def __init__(self, include_archived:bool=False):
         """
         Initialise the class
-
-        :param include_archived: whether to include archived groups
         """
         self.__include_archived = include_archived
 
 
     @property
     def _end_point(self) -> str:
-        return super()._end_point + '/groups'
+        return super()._end_point + '/networks'
 
     @property
-    def names(self) -> dict[int, str]:
+    def networks(self) -> dict[int, 'Network']:
         """
-        All the groups presented as a dictionary with the group ID as key
+        All the groups presented as a dictionary with the network ID as key
         """
-        response = self._get_response(
-            f'names?includeArchived={str(self.__include_archived).lower()}')
+        response = self._get_response('')
 
-        return { item['id'] : item['name'] for item in response['data'] }
+        return { item['id'] : Network(network_id=item['id'],network_payload=item)
+                 for item in response['data'] }
 
     def _refresh(self) -> None:
         raise NotImplementedError('groups do not have base data')
 
-class Group(APIBase):
+class Network(APIBase):
     """
-    A group on the Restarters.net website
+    A Network on the Restarters.net website
     """
-    def __init__(self, group_id: int):
+    def __init__(self, network_id: int, network_payload:None|dict[str, Any] = None):
         """
-        Initialise the close
+        Initialise the class
 
-        :param group_id: ID for the group
+        :param network_id: ID for the network
+        :param network_payload: Dictionary of content for the event (assuming it has been
+                                retrieved in a previous operation
         """
 
-        self.__group_id = group_id
-        self._refresh()
+        self.__network_id = network_id
+        if network_payload is None:
+            self._refresh()
+        else:
+            self.__data = network_payload
 
 
     @property
-    def group_id(self) -> int:
+    def network_id(self) -> int:
         """
-        Group ID
+        Network ID
         """
-        return self.__group_id
+        return self.__network_id
 
     @property
     def name(self) -> str:
@@ -95,21 +99,30 @@ class Group(APIBase):
 
     @property
     def _end_point(self) -> str:
-        return super()._end_point + '/groups/' + f'{self.group_id}'
+        return super()._end_point + '/networks/' + f'{self.network_id}'
 
     @property
     def events(self) -> dict[int, Event]:
         """
-        Group Events
+        Network Events
         """
         response = self._get_response('events')
         return {item['id']: Event(event_id=item['id'], event_payload=item)
                 for item in response['data']}
 
     @property
+    def groups(self) -> dict[int, Group]:
+        """
+        Network Events
+        """
+        response = self._get_response('groups')
+        return {item['id']: Group(event_id=item['id'], event_payload=item)
+                for item in response['data']}
+
+    @property
     def past_events(self) -> dict[int, Event]:
         """
-        Past events for the group
+        Past events for the Network
         """
         now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
         response = self._get_response(f'events?end={urllib.parse.quote_plus(now.isoformat())}')
@@ -119,21 +132,12 @@ class Group(APIBase):
     @property
     def future_events(self) -> dict[int, Event]:
         """
-        Future events for the group
+        Future events for the Network
         """
         now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
         response = self._get_response(f'events?start={urllib.parse.quote_plus(now.isoformat())}')
         return { item['id'] : Event(event_id=item['id'], event_payload=item)
                  for item in response['data']}
-
-    @property
-    def next_event(self) -> Event:
-        """
-        Next event
-        """
-        next_event_id = self.__data['next_event']['id']
-        return Event(event_id=next_event_id)
-
 
     def _refresh(self) -> None:
         response = self._get_response('')

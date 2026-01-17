@@ -14,10 +14,25 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+This module test the Group API which gives access to all the group ID and names
 """
-# pylint:disable=invalid-name
-from .groups import Groups
-from .groups import Group
-from .events import Event
-from .networks import Networks
-from .networks import Network
+import pytest
+
+from pyRestarters import Networks as PyRestartersNetworks
+
+@pytest.fixture(scope='session', name='pyrestarters_networks')
+def pyrestarters_networks_implementation():
+    """
+    A fixture that make a connection to the real restarters.net without the API key
+    """
+    yield PyRestartersNetworks()
+
+def test_network_names(pyrestarters_networks):
+    """
+    test the download of the group names and tags
+    """
+    assert isinstance(pyrestarters_networks, PyRestartersNetworks)
+    networks = pyrestarters_networks.networks
+    # network ID one is held by default Network
+    assert networks[1] == 'Default Network'
