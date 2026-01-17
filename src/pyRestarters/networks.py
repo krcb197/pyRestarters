@@ -116,7 +116,7 @@ class Network(APIBase):
         Network Events
         """
         response = self._get_response('groups')
-        return {item['id']: Group(event_id=item['id'], event_payload=item)
+        return {item['id']: Group(group_id=item['id'])
                 for item in response['data']}
 
     @property
@@ -142,3 +142,7 @@ class Network(APIBase):
     def _refresh(self) -> None:
         response = self._get_response('')
         self.__data = response['data']
+
+    @property
+    def _request_get_timeout(self) -> float:
+        return 60.0

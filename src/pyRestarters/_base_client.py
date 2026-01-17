@@ -43,7 +43,7 @@ class APIBase(ABC):
         response = requests.get(
             url=full_end_point,
             headers={"Accept": "application/json", },
-            timeout=10.0
+            timeout=self._request_get_timeout
         )
 
         if not response.status_code == 200:
@@ -56,3 +56,7 @@ class APIBase(ABC):
         """
         Refresh the payload data
         """
+
+    @property
+    def _request_get_timeout(self) -> float:
+        return 10.0
