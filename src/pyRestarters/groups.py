@@ -119,6 +119,15 @@ class Group(APIBase):
         return { item['id'] : Event(event_id=item['id'], event_payload=item)
                  for item in response['data']}
 
+    @property
+    def next_event(self) -> Event:
+        """
+        Next event
+        """
+        next_event_id = self.__data['next_event']['id']
+        return Event(event_id=next_event_id)
+
+
     def _refresh(self) -> None:
         response = self._get_response('')
         self.__data = response['data']
