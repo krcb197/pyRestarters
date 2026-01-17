@@ -17,13 +17,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 This module provides access to the events part of the API
 """
-from typing import Optional, Any
+from typing import Any
 
 from ._base_client import APIBase
 
 class Event(APIBase):
+    """
+    Event on the Restarters.net website
+    """
 
-    def __init__(self, event_id: int, event_payload:Optional[dict[str, Any]] = None):
+
+    def __init__(self, event_id: int, event_payload:None|dict[str, Any] = None):
+        """
+        Initialise the class
+
+        :param event_id: Event ID
+        :param event_payload: Dictionary of content for the event (assuming it has been
+                              retrieved in a previous operation
+        """
 
         self.__event_id = event_id
         if event_payload is None:
@@ -42,10 +53,13 @@ class Event(APIBase):
     def _end_point(self) -> str:
         return super()._end_point + '/events/' + f'{self.__event_id}'
 
-    def _refresh(self):
+    def _refresh(self) -> None:
         response = self._get_response('')
         self.__data = response['data']
 
     @property
-    def title(self):
+    def title(self) -> str:
+        """
+        Event Title
+        """
         return self.__data['title']

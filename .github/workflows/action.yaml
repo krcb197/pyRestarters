@@ -68,7 +68,7 @@ jobs:
           python -m pip install .
           python -m pip install .[dev]
       - name: Type Check
-        run: mypy src/pytito
+        run: mypy src/pyRestarters
 
   unit_tests:
     needs:

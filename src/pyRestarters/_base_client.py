@@ -23,6 +23,7 @@ from typing import Any
 
 import requests
 
+#pylint:disable-next=too-few-public-methods
 class APIBase(ABC):
     """
     Base class for accessing parts of the API
@@ -51,7 +52,7 @@ class APIBase(ABC):
         return response.json()
 
     @abstractmethod
-    def _refresh(self):
+    def _refresh(self) -> None:
         """
         Refresh the payload data
         """

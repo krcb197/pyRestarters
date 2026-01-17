@@ -20,15 +20,20 @@ This module provides access to the groups and groups part of the API
 
 import datetime
 import urllib.parse
-from http.client import responses
 
 from ._base_client import APIBase
 from .events import Event
 
+#pylint:disable-next=too-few-public-methods
 class Groups(APIBase):
+    """
+    All the groups on the Restarters.net website
+    """
+
 
     def __init__(self, include_archived:bool=False):
         """
+        Initialise the class
 
         :param include_archived: whether to include archived groups
         """
@@ -41,17 +46,27 @@ class Groups(APIBase):
 
     @property
     def names(self) -> dict[int, str]:
+        """
+        All the groups presented as a dictionary with the group ID as key
+        """
         response = self._get_response(
             f'names?includeArchived={str(self.__include_archived).lower()}')
 
         return { item['id'] : item['name'] for item in response['data'] }
 
-    def _refresh(self):
+    def _refresh(self) -> None:
         raise NotImplementedError('groups do not have base data')
 
 class Group(APIBase):
-
+    """
+    A group on the Restarters.net website
+    """
     def __init__(self, group_id: int):
+        """
+        Initialise the close
+
+        :param group_id: ID for the group
+        """
 
         self.__group_id = group_id
         self._refresh()
@@ -65,7 +80,10 @@ class Group(APIBase):
         return self.__group_id
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """
+        Group Name
+        """
         return self.__data['name']
 
     @property
@@ -73,17 +91,34 @@ class Group(APIBase):
         return super()._end_point + '/groups/' + f'{self.group_id}'
 
     @property
-    def events(self):
+    def events(self) -> dict[int, Event]:
+        """
+        Group Events
+        """
         response = self._get_response('events')
-        return
+        return {item['id']: Event(event_id=item['id'], event_payload=item)
+                for item in response['data']}
+
+    @property
+    def past_events(self) -> dict[int, Event]:
+        """
+        Past events for the group
+        """
+        now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
+        response = self._get_response(f'events?end={urllib.parse.quote_plus(now.isoformat())}')
+        return { item['id'] : Event(event_id=item['id'], event_payload=item)
+                 for item in response['data']}
 
     @property
     def future_events(self) -> dict[int, Event]:
+        """
+        Future events for the group
+        """
         now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
         response = self._get_response(f'events?start={urllib.parse.quote_plus(now.isoformat())}')
         return { item['id'] : Event(event_id=item['id'], event_payload=item)
                  for item in response['data']}
 
-    def _refresh(self):
+    def _refresh(self) -> None:
         response = self._get_response('')
         self.__data = response['data']
