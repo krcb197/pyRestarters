@@ -15,14 +15,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-This module test the Group API which gives access to all the group ID and names
+This module test the Network API which gives access to all the Network ID and names
 """
+from collections.abc import Iterator
 import pytest
 
 from pyRestarters import Networks as PyRestartersNetworks
 
 @pytest.fixture(scope='session', name='pyrestarters_networks')
-def pyrestarters_networks_implementation():
+def pyrestarters_networks_implementation() -> Iterator[PyRestartersNetworks]:
     """
     A fixture that make a connection to the real restarters.net without the API key
     """
@@ -30,13 +31,13 @@ def pyrestarters_networks_implementation():
 
 
 @pytest.fixture(scope='session', name='pyrestarters_networks_test_server')
-def pyrestarters_networks_test_server_implementation():
+def pyrestarters_networks_test_server_implementation() -> Iterator[PyRestartersNetworks]:
     """
     A fixture that make a connection to the real restarters.net without the API key
     """
     yield PyRestartersNetworks(test_server=True)
 
-def test_network_names(pyrestarters_networks):
+def test_network_names(pyrestarters_networks: PyRestartersNetworks) -> None:
     """
     test the download of the group names and tags
     """
@@ -46,7 +47,7 @@ def test_network_names(pyrestarters_networks):
     assert networks[1].name == 'Default Network'
 
 @pytest.mark.skip('test server does not work')
-def test_network_names_test_server(pyrestarters_networks_test_server):
+def test_network_names_test_server(pyrestarters_networks_test_server:PyRestartersNetworks) -> None:
     """
     test the download of the group names and tags on the test server
     """

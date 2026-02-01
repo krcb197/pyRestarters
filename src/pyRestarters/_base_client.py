@@ -40,7 +40,7 @@ class APIBase(ABC):
         return "https://restarters.net/api/v2"
 
     @property
-    def _test_server(self):
+    def _test_server(self) -> bool:
         return self.__test_server
 
     def _get_response(self, endpoint: str) -> dict[str, Any]:

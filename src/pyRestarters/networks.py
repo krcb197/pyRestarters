@@ -18,12 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 This module provides access to the Networks and Network part of the API
 """
 from typing import Any
-import datetime
-import urllib.parse
 
 from ._base_client import APIBase
-from .events import Event
 from .groups import Group
+from .events import WithChildEvent
 
 #pylint:disable-next=too-few-public-methods
 class Networks(APIBase):
@@ -48,7 +46,7 @@ class Networks(APIBase):
     def _refresh(self) -> None:
         raise NotImplementedError('groups do not have base data')
 
-class Network(APIBase):
+class Network(WithChildEvent):
     """
     A Network on the Restarters.net website
     """

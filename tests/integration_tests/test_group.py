@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 This module test the Group API which gives access to all the group ID and names
 """
-from typing import Iterator
+from collections.abc import Iterator
 import pytest
 
 from pyRestarters.groups import Groups as PyRestartersGroups
