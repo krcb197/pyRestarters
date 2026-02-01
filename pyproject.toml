@@ -8,7 +8,7 @@ dynamic = ["version"]
 # Callable is broken in python 3.9.0 and 3.9.1 so these need to be excluded
 requires-python = ">=3.10"
 dependencies = [
-    "requests",
+
 ]
 
 authors = [
@@ -50,7 +50,6 @@ version = {attr = "pyRestarters.__about__.__version__"}
 dev = [
     "mypy",
     "pylint",
-    "types-requests",
     "pytest",
 ]
 unit_tests = [
