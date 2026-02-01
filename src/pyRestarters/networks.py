@@ -31,13 +31,6 @@ class Networks(APIBase):
     All the networks on the Restarters.net website
     """
 
-
-    def __init__(self):
-        """
-        Initialise the class
-        """
-
-
     @property
     def _end_point(self) -> str:
         return super()._end_point + '/networks'
@@ -59,7 +52,8 @@ class Network(APIBase):
     """
     A Network on the Restarters.net website
     """
-    def __init__(self, network_id: int, network_payload:None|dict[str, Any] = None):
+    def __init__(self, network_id: int, network_payload:None|dict[str, Any] = None,
+                 test_server:bool=False):
         """
         Initialise the class
 
@@ -67,6 +61,7 @@ class Network(APIBase):
         :param network_payload: Dictionary of content for the event (assuming it has been
                                 retrieved in a previous operation
         """
+        super().__init__(test_server=test_server)
 
         self.__network_id = network_id
         if network_payload is None:
@@ -101,15 +96,6 @@ class Network(APIBase):
         return super()._end_point + '/networks/' + f'{self.network_id}'
 
     @property
-    def events(self) -> dict[int, Event]:
-        """
-        Network Events
-        """
-        response = self._get_response('events')
-        return {item['id']: Event(event_id=item['id'], event_payload=item)
-                for item in response['data']}
-
-    @property
     def groups(self) -> dict[int, Group]:
         """
         Network Events
@@ -117,28 +103,6 @@ class Network(APIBase):
         response = self._get_response('groups')
         return {item['id']: Group(group_id=item['id'])
                 for item in response['data']}
-
-    @property
-    def past_events(self) -> dict[int, Event]:
-        """
-        Past events for the Network
-        """
-        # pylint:disable=duplicate-code
-        now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
-        response = self._get_response(f'events?end={urllib.parse.quote_plus(now.isoformat())}')
-        return { item['id'] : Event(event_id=item['id'], event_payload=item)
-                 for item in response['data']}
-
-    @property
-    def future_events(self) -> dict[int, Event]:
-        """
-        Future events for the Network
-        """
-        # pylint:disable=duplicate-code
-        now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
-        response = self._get_response(f'events?start={urllib.parse.quote_plus(now.isoformat())}')
-        return { item['id'] : Event(event_id=item['id'], event_payload=item)
-                 for item in response['data']}
 
     def _refresh(self) -> None:
         response = self._get_response('')

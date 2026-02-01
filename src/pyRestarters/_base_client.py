@@ -29,10 +29,19 @@ class APIBase(ABC):
     """
     Base class for accessing parts of the API
     """
+    def __init__(self, test_server:bool=False):
+        self.__test_server = test_server
 
     @property
     def _end_point(self) -> str:
+        if self._test_server:
+            return "http://restarters.test:8000"
+
         return "https://restarters.net/api/v2"
+
+    @property
+    def _test_server(self):
+        return self.__test_server
 
     def _get_response(self, endpoint: str) -> dict[str, Any]:
 

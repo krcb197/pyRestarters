@@ -17,21 +17,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 This module provides access to the groups and groups part of the API
 """
-
-import datetime
-import urllib.parse
-
 from ._base_client import APIBase
-from .events import Event
+from .events import Event, WithChildEvent
 
 #pylint:disable-next=too-few-public-methods
 class Groups(APIBase):
     """
     All the groups on the Restarters.net website
     """
-
-
-    def __init__(self, include_archived:bool=False):
+    def __init__(self, include_archived:bool=False, test_server:bool=False):
         """
         Initialise the class
 
@@ -57,16 +51,17 @@ class Groups(APIBase):
     def _refresh(self) -> None:
         raise NotImplementedError('groups do not have base data')
 
-class Group(APIBase):
+class Group(WithChildEvent):
     """
     A group on the Restarters.net website
     """
-    def __init__(self, group_id: int):
+    def __init__(self, group_id: int, test_server:bool=False):
         """
         Initialise the close
 
         :param group_id: ID for the group
         """
+        super().__init__(test_server=test_server)
 
         self.__group_id = group_id
         self._refresh()
@@ -98,41 +93,12 @@ class Group(APIBase):
         return super()._end_point + '/groups/' + f'{self.group_id}'
 
     @property
-    def events(self) -> dict[int, Event]:
-        """
-        Group Events
-        """
-        response = self._get_response('events')
-        return {item['id']: Event(event_id=item['id'], event_payload=item)
-                for item in response['data']}
-
-    @property
-    def past_events(self) -> dict[int, Event]:
-        """
-        Past events for the group
-        """
-        now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
-        response = self._get_response(f'events?end={urllib.parse.quote_plus(now.isoformat())}')
-        return { item['id'] : Event(event_id=item['id'], event_payload=item)
-                 for item in response['data']}
-
-    @property
-    def future_events(self) -> dict[int, Event]:
-        """
-        Future events for the group
-        """
-        now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
-        response = self._get_response(f'events?start={urllib.parse.quote_plus(now.isoformat())}')
-        return { item['id'] : Event(event_id=item['id'], event_payload=item)
-                 for item in response['data']}
-
-    @property
     def next_event(self) -> Event:
         """
         Next event
         """
         next_event_id = self.__data['next_event']['id']
-        return Event(event_id=next_event_id)
+        return Event(event_id=next_event_id, test_server=self._test_server)
 
 
     def _refresh(self) -> None:

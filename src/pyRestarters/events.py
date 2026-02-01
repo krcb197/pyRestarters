@@ -18,7 +18,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 This module provides access to the events part of the API
 """
 from typing import Any
-from datetime import datetime
+import datetime
+from abc import ABC
+import urllib.parse
 
 from ._base_client import APIBase
 
@@ -28,7 +30,8 @@ class Event(APIBase):
     """
 
 
-    def __init__(self, event_id: int, event_payload:None|dict[str, Any] = None):
+    def __init__(self, event_id: int, event_payload:None|dict[str, Any] = None,
+                 test_server:bool=False):
         """
         Initialise the class
 
@@ -36,6 +39,7 @@ class Event(APIBase):
         :param event_payload: Dictionary of content for the event (assuming it has been
                               retrieved in a previous operation
         """
+        super().__init__(test_server=test_server)
 
         self.__event_id = event_id
         if event_payload is None:
@@ -66,7 +70,7 @@ class Event(APIBase):
         return self.__data['title']
 
     @property
-    def start(self) -> datetime:
+    def start(self) -> datetime.datetime:
         """
         Start date and time for the event
         """
@@ -74,9 +78,46 @@ class Event(APIBase):
         return self._datetime_from_json(start_str)
 
     @property
-    def end_at(self) -> datetime:
+    def end_at(self) -> datetime.datetime:
         """
         End date and time for the event
         """
         end_str = self.__data['end']
         return self._datetime_from_json(end_str)
+
+class WithChildEvent(APIBase, ABC):
+    """
+    A object in the data model that has child events
+    """
+
+    @property
+    def events(self) -> dict[int, Event]:
+        """
+        Events
+        """
+        response = self._get_response('events')
+        return {item['id']: Event(event_id=item['id'], event_payload=item,
+                                  test_server=self._test_server)
+                for item in response['data']}
+
+    @property
+    def past_events(self) -> dict[int, Event]:
+        """
+        Past events
+        """
+        now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
+        response = self._get_response(f'events?end={urllib.parse.quote_plus(now.isoformat())}')
+        return { item['id'] : Event(event_id=item['id'], event_payload=item,
+                                    test_server=self._test_server)
+                 for item in response['data']}
+
+    @property
+    def future_events(self) -> dict[int, Event]:
+        """
+        Future events
+        """
+        now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
+        response = self._get_response(f'events?start={urllib.parse.quote_plus(now.isoformat())}')
+        return { item['id'] : Event(event_id=item['id'], event_payload=item,
+                                    test_server=self._test_server)
+                 for item in response['data']}

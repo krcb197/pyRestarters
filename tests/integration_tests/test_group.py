@@ -17,18 +17,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 This module test the Group API which gives access to all the group ID and names
 """
+from typing import Iterator
 import pytest
 
 from pyRestarters.groups import Groups as PyRestartersGroups
 
 @pytest.fixture(scope='session', name='pyrestarters_groups')
-def pyrestarters_groups_implementation():
+def pyrestarters_groups_implementation() -> Iterator[PyRestartersGroups]:
     """
     A fixture that make a connection to the real restarters.net without the API key
     """
     yield PyRestartersGroups()
 
-def test_groups_names(pyrestarters_groups):
+def test_groups_names(pyrestarters_groups: PyRestartersGroups) -> None:
     """
     test the download of the group names and tags
     """

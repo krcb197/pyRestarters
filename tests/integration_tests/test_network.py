@@ -28,6 +28,13 @@ def pyrestarters_networks_implementation():
     """
     yield PyRestartersNetworks()
 
+@pytest.fixture(scope='session', name='pyrestarters_networks_test_server')
+def pyrestarters_networks_test_server_implementation():
+    """
+    A fixture that make a connection to the real restarters.net without the API key
+    """
+    yield PyRestartersNetworks(test_server=True)
+
 def test_network_names(pyrestarters_networks):
     """
     test the download of the group names and tags
@@ -35,4 +42,13 @@ def test_network_names(pyrestarters_networks):
     assert isinstance(pyrestarters_networks, PyRestartersNetworks)
     networks = pyrestarters_networks.networks
     # network ID one is held by default Network
-    assert networks[1] == 'Default Network'
+    assert networks[1].name == 'Default Network'
+
+def test_network_names_test_server(pyrestarters_networks_test_server):
+    """
+    test the download of the group names and tags on the test server
+    """
+    assert isinstance(pyrestarters_networks_test_server, PyRestartersNetworks)
+    networks = pyrestarters_networks_test_server.networks
+    # network ID one is held by default Network
+    assert networks[1].name == 'Default Network'
