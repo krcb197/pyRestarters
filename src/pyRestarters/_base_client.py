@@ -35,7 +35,7 @@ class APIBase(ABC):
     @property
     def _end_point(self) -> str:
         if self._test_server:
-            return "http://restarters.test:8000"
+            return "http://restarters.net:8000/api/v2"
 
         return "https://restarters.net/api/v2"
 

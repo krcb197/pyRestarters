@@ -31,6 +31,7 @@ class Groups(APIBase):
 
         :param include_archived: whether to include archived groups
         """
+        super().__init__(test_server=test_server)
         self.__include_archived = include_archived
 
 

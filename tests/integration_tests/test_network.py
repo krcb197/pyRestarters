@@ -28,6 +28,7 @@ def pyrestarters_networks_implementation():
     """
     yield PyRestartersNetworks()
 
+
 @pytest.fixture(scope='session', name='pyrestarters_networks_test_server')
 def pyrestarters_networks_test_server_implementation():
     """
@@ -44,6 +45,7 @@ def test_network_names(pyrestarters_networks):
     # network ID one is held by default Network
     assert networks[1].name == 'Default Network'
 
+@pytest.mark.skip('test server does not work')
 def test_network_names_test_server(pyrestarters_networks_test_server):
     """
     test the download of the group names and tags on the test server
