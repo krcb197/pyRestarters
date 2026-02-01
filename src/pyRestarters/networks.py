@@ -32,11 +32,10 @@ class Networks(APIBase):
     """
 
 
-    def __init__(self, include_archived:bool=False):
+    def __init__(self):
         """
         Initialise the class
         """
-        self.__include_archived = include_archived
 
 
     @property
@@ -124,6 +123,7 @@ class Network(APIBase):
         """
         Past events for the Network
         """
+        # pylint:disable=duplicate-code
         now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
         response = self._get_response(f'events?end={urllib.parse.quote_plus(now.isoformat())}')
         return { item['id'] : Event(event_id=item['id'], event_payload=item)
@@ -134,6 +134,7 @@ class Network(APIBase):
         """
         Future events for the Network
         """
+        # pylint:disable=duplicate-code
         now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
         response = self._get_response(f'events?start={urllib.parse.quote_plus(now.isoformat())}')
         return { item['id'] : Event(event_id=item['id'], event_payload=item)
