@@ -20,6 +20,7 @@ This module provides the common access compontents to be used by the other class
 
 from abc import ABC, abstractmethod
 from typing import Any
+from datetime import datetime
 
 import requests
 
@@ -60,3 +61,10 @@ class APIBase(ABC):
     @property
     def _request_get_timeout(self) -> float:
         return 10.0
+
+    @staticmethod
+    def _datetime_from_json(data:str) -> datetime:
+        """
+        convert the isoformat datetime from the json content to a python object
+        """
+        return datetime.fromisoformat(data)

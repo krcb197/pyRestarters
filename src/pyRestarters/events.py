@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 This module provides access to the events part of the API
 """
 from typing import Any
+from datetime import datetime
 
 from ._base_client import APIBase
 
@@ -63,3 +64,19 @@ class Event(APIBase):
         Event Title
         """
         return self.__data['title']
+
+    @property
+    def start(self) -> datetime:
+        """
+        Start date and time for the event
+        """
+        start_str = self.__data['start']
+        return self._datetime_from_json(start_str)
+
+    @property
+    def end_at(self) -> datetime:
+        """
+        End date and time for the event
+        """
+        end_str = self.__data['end']
+        return self._datetime_from_json(end_str)
