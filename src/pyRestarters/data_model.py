@@ -29,6 +29,9 @@ from abc import ABC
 from ._base_client import APIBase
 
 class LocationCoordinates(NamedTuple):
+    """
+    Tuple for latitude and longitude
+    """
     latitude: float
     longitude: float
 
@@ -101,6 +104,9 @@ class Event(APIBase):
 
     @property
     def coordinates(self) -> LocationCoordinates:
+        """
+        Location of the event
+        """
         lng = self.__data['lng']
         lat = self.__data['lat']
         return LocationCoordinates(longitude=lng, latitude=lat)
@@ -140,13 +146,23 @@ class _WithChildEvent(APIBase, ABC):
         now = datetime.datetime.now(tz=datetime.timezone.utc).replace(microsecond=0)
         return self.events_in_daterange(start=now, end=None)
 
-    def events_in_daterange(self, start:datetime.datetime|None, end:datetime.datetime|None) -> dict[int, Event]:
+    def events_in_daterange(self,
+                            start:datetime.datetime|None,
+                            end:datetime.datetime|None) -> dict[int, Event]:
+        """
+        Provide all the events in a date range. Setting either Start or End to None will
+        remove that filter
+
+        Returns:
+            A dictionary of events with the event ID as the key
+        """
         if start is None and end is not None:
             query_str=f'events?end={urllib.parse.quote_plus(end.isoformat())}'
         elif start is not None and end is None:
             query_str=f'events?start={urllib.parse.quote_plus(start.isoformat())}'
         elif start is not None and end is not None:
-            query_str=f'events?start={urllib.parse.quote_plus(start.isoformat())}&end={urllib.parse.quote_plus(end.isoformat())}'
+            query_str=(f'events?start={urllib.parse.quote_plus(start.isoformat())}'
+                       f'&end={urllib.parse.quote_plus(end.isoformat())}')
         else:
             query_str = 'events'
 
@@ -157,6 +173,9 @@ class _WithChildEvent(APIBase, ABC):
 
 @dataclass(frozen=True)
 class GroupTag:
+    """
+    Data class to hold an tag
+    """
     id : int
     name : str
     description : str
@@ -295,8 +314,8 @@ class Groups(APIBase):
 
 
     def __iter__(self) -> Iterator[Group]:
-        for id in self.names.keys():
-            yield Group(group_id=id)
+        for group_id in self.names.keys():
+            yield Group(group_id=group_id)
 
     def _refresh(self) -> None:
         raise NotImplementedError('groups do not have base data')

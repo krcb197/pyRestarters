@@ -20,7 +20,7 @@ This module test the Group API which gives access to all the group ID and names
 from collections.abc import Iterator
 import pytest
 
-from pyRestarters.groups import Groups as PyRestartersGroups
+from pyRestarters import Groups as PyRestartersGroups
 
 @pytest.fixture(scope='session', name='pyrestarters_groups')
 def pyrestarters_groups_implementation() -> Iterator[PyRestartersGroups]:
