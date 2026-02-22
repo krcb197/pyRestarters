@@ -16,8 +16,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # pylint:disable=invalid-name
-from .groups import Groups
-from .groups import Group
-from .events import Event
-from .networks import Networks
-from .networks import Network
+from .data_model import Groups
+from .data_model import Group
+from .data_model import Event
+from .data_model import Networks
+from .data_model import Network
