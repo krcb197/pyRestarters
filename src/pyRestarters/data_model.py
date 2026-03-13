@@ -246,6 +246,34 @@ class Group(_WithChildEvent):
         return [GroupTag(id=tag['id'], name=tag['name'], description=tag['description'])
                 for tag in tags]
 
+    @property
+    def website(self) -> str:
+        """
+        Group Description
+        """
+        return self.__data['website']
+
+    @property
+    def email(self) -> str:
+        """
+        Group Description
+        """
+        return self.__data['email']
+
+    @property
+    def postal_address(self) -> str:
+        """
+        Group Description
+        """
+        return self.__data['location']['location']
+
+    @property
+    def postcode(self) -> str:
+        """
+        Group Description
+        """
+        return self.__data['location']['postcode']
+
 
 
 class Groups(APIBase):
