@@ -21,7 +21,7 @@ from functools import cached_property
 from collections.abc import Iterator
 from typing import Any, NamedTuple
 import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 import urllib.parse
 from abc import ABC
@@ -34,6 +34,63 @@ class LocationCoordinates(NamedTuple):
     """
     latitude: float
     longitude: float
+
+@dataclass
+class Statistics:
+    co2_powered: float
+    co2_unpowered: float
+    co2_total: float
+    waste_powered: float
+    waste_unpowered: float
+    waste_total: float
+    fixed_devices: int
+    fixed_powered: int
+    fixed_unpowered: int
+    repairable_devices: int
+    dead_devices: int
+    unknown_repair_status: int
+    devices_powered: int
+    devices_unpowered: int
+    no_weight_powered: int
+    no_weight_unpowered: int
+    participants: int
+    volunteers: int
+    hours_volunteered: int
+    invited: int
+
+    def __add__(self, other: Statistics) -> Statistics:
+        if not isinstance(other, Statistics):
+            return NotImplemented
+
+        return Statistics(
+            **{
+                field.name: getattr(self, field.name) + getattr(other, field.name)
+                for field in fields(self)
+            }
+        )
+
+zero_stats = Statistics(
+    co2_powered=0,
+    co2_unpowered=0,
+    co2_total=0,
+    waste_powered=0,
+    waste_unpowered=0,
+    waste_total=0,
+    fixed_devices=0,
+    fixed_powered=0,
+    fixed_unpowered=0,
+    repairable_devices=0,
+    dead_devices=0,
+    unknown_repair_status=0,
+    devices_powered=0,
+    devices_unpowered=0,
+    no_weight_powered=0,
+    no_weight_unpowered=0,
+    participants=0,
+    volunteers=0,
+    hours_volunteered=0,
+    invited=0,
+)
 
 class Event(APIBase):
     """
@@ -110,6 +167,18 @@ class Event(APIBase):
         lng = self.__data['lng']
         lat = self.__data['lat']
         return LocationCoordinates(longitude=lng, latitude=lat)
+
+    @property
+    def statistics(self) -> Statistics:
+        """
+        The event statistics from restarters
+        """
+        if 'stats' not in self.__data:
+            self._refresh()
+
+        return Statistics(**self.__data['stats'])
+
+
 
 
 class _WithChildEvent(APIBase, ABC):
