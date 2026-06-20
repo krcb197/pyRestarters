@@ -19,14 +19,22 @@ This module provides access to the events, groups and groups part of the API
 """
 from functools import cached_property
 from collections.abc import Iterator
-from typing import Any, NamedTuple, Self
+from typing import Any, NamedTuple
 import datetime
 from dataclasses import dataclass, fields
+import sys
 
 import urllib.parse
 from abc import ABC
 
 from ._base_client import APIBase
+
+# pylint: disable=duplicate-code
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+# pylint: enable=duplicate-code
 
 class LocationCoordinates(NamedTuple):
     """
